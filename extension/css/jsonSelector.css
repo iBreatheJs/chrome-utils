@@ -1,0 +1,23 @@
+/* .jsonDiv {
+  border-width: 5px;
+  border-color: black;
+  border-style: solid;
+}
+.jsonDiv:hover {
+  background-color: yellow;
+} */
+
+/* .jsonDiv:hover {
+  border: solid 1px red;
+}
+.jsonDiv > .jsonDiv:hover {
+  border: solid 1px green;
+} */
+
+/* https://stackoverflow.com/questions/6679283/css-hover-only-affect-top-div-of-nest
+   only select top element on hover, by default it selects all layered divs
+   potentially better to just use js, todo: test
+*/
+div.jsonDiv:not(:has(div.jsonDiv:hover)):hover {
+  background-color: yellow;
+}
