@@ -62,14 +62,20 @@ export class ExtensionLogger {
         })
 
         container.appendChild(toast);
-        requestAnimationFrame(() => {
-            toast.classList.add('visible');
-        });
 
-        setTimeout(() => {
+        requestAnimationFrame(() => toast.classList.add('visible'));
+
+        let timeoutId = setTimeout(() => hide(), duration);
+
+        function hide() {
             toast.classList.remove('visible');
-            setTimeout(() => toast.remove(), 3000);
-        }, duration);
+            setTimeout(() => toast.remove(), 300);
+        }
+
+        toast.addEventListener('mouseenter', () => clearTimeout(timeoutId));
+        toast.addEventListener('mouseleave', () => {
+            timeoutId = setTimeout(() => hide(), 1000);
+        });
     }
 
     public async showLogOverlay(): Promise<void> {
@@ -81,16 +87,29 @@ export class ExtensionLogger {
         overlay.id = ExtensionLogger.LOG_OVERLAY_ID;
         overlay.className = 'ext-log-overlay';
 
+        const header = document.createElement('div');
+        header.className = 'ext-log-header';
+
         const closeBtn = document.createElement('button');
         closeBtn.textContent = '×';
         closeBtn.className = 'ext-close-btn';
         closeBtn.onclick = () => overlay.remove();
 
+        const clearBtn = document.createElement('button');
+        clearBtn.textContent = 'Clear Logs';
+        clearBtn.className = 'ext-clear-btn';
+        clearBtn.onclick = async () => {
+            await this.clearLogs();
+            content.textContent = '';
+        };
+
+        header.append(clearBtn, closeBtn);
+
         const content = document.createElement('pre');
+        content.className = 'ext-log-content';
         content.textContent = this.logs.join('\n');
 
-        overlay.appendChild(closeBtn);
-        overlay.appendChild(content);
+        overlay.append(header, content);
         document.body.appendChild(overlay);
     }
 
@@ -135,29 +154,45 @@ export class ExtensionLogger {
 
       .ext-log-overlay {
         position: fixed;
-        top: 50px;
-        right: 50px;
-        width: 400px;
-        height: 300px;
+        top: 10%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80vw;
+        max-width: 700px;
+        max-height: 80vh;
         background: white;
         border: 1px solid #ccc;
         box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         z-index: 999999;
         padding: 10px;
-        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        resize: both;
+        overflow: auto;
         font-family: monospace;
         font-size: 12px;
-        white-space: pre-wrap;
       }
 
-      .ext-close-btn {
-        position: absolute;
-        top: 5px;
-        right: 10px;
+      .ext-log-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 5px;
+      }
+
+      .ext-close-btn,
+      .ext-clear-btn {
         background: transparent;
-        border: none;
-        font-size: 16px;
+        border: 1px solid #ccc;
+        padding: 2px 8px;
+        border-radius: 4px;
         cursor: pointer;
+        font-size: 13px;
+      }
+
+      .ext-log-content {
+        white-space: pre-wrap;
+        flex-grow: 1;
+        overflow-y: auto;
       }
     `;
         document.head.appendChild(style);
