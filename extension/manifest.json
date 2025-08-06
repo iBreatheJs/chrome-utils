@@ -18,21 +18,6 @@
         },
         {
             "matches": [
-                "<all_urls>"
-            ],
-            "exclude_matches": [
-                "https://www.youtube.com/*"
-            ],
-            "js": [
-                "js/content_noYT.js"
-            ],
-            "css": [
-                "css/jsonSelector.css"
-            ],
-            "all_frames": true
-        },
-        {
-            "matches": [
                 "https://chat.openai.com/c/*",
                 "https://chatgpt.com/c/*"
             ],
